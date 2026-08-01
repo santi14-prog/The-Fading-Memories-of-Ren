@@ -1,0 +1,87 @@
+[gd_scene format=3 uid="uid://dgbnsyo3qpu5"]
+
+[ext_resource type="Script" uid="uid://brj6681ch40ny" path="res://enemy.gd" id="1_hb8ge"]
+[ext_resource type="Texture2D" uid="uid://bac82ki2co0u0" path="res://sprites/Inimigo/enemy_death_0.png" id="1_wujgv"]
+[ext_resource type="Texture2D" uid="uid://dxn14uxeqnamq" path="res://sprites/Inimigo/enemy_death_1.png" id="2_hb8ge"]
+[ext_resource type="Texture2D" uid="uid://ds8li6hc31olq" path="res://sprites/Inimigo/enemy_hurt_0.png" id="3_e1ltt"]
+[ext_resource type="Texture2D" uid="uid://c1sbmo5hvcpqn" path="res://sprites/Inimigo/enemy_idle_0.png" id="4_dxifv"]
+[ext_resource type="Texture2D" uid="uid://cwkmd6rau6xmp" path="res://sprites/Inimigo/enemy_idle_1.png" id="5_pwjut"]
+[ext_resource type="Texture2D" uid="uid://41wadau7jsgx" path="res://sprites/Inimigo/enemy_walk_0.png" id="6_n0g06"]
+[ext_resource type="Texture2D" uid="uid://dba1lt3l2hdnh" path="res://sprites/Inimigo/enemy_walk_1.png" id="7_ar8e5"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ciykk"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_wujgv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_hb8ge")
+}],
+"loop": 0,
+"name": &"death",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_e1ltt")
+}],
+"loop": 0,
+"name": &"hurt",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_dxifv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_pwjut")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 3.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_n0g06")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_ar8e5")
+}],
+"loop": 1,
+"name": &"walk",
+"speed": 4.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ciykk"]
+radius = 24.0
+
+[node name="Enemy" type="CharacterBody2D" unique_id=854229256]
+script = ExtResource("1_hb8ge")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1213989894]
+sprite_frames = SubResource("SpriteFrames_ciykk")
+animation = &"death"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AnimatedSprite2D" unique_id=1396646149]
+shape = SubResource("CircleShape2D_ciykk")
+
+[node name="HealthBarContainer" type="Node2D" parent="." unique_id=973632553]
+position = Vector2(0, -40)
+
+[node name="Background" type="ColorRect" parent="HealthBarContainer" unique_id=604694407]
+custom_minimum_size = Vector2(40, 6)
+custom_maximum_size = Vector2(40, 6)
+offset_left = -19.0
+offset_top = -7.0
+offset_right = 21.0
+offset_bottom = -1.0
+color = Color(0.16470589, 0.16470589, 0.16470589, 1)
+
+[node name="Fill" type="ColorRect" parent="HealthBarContainer" unique_id=2107078997]
+custom_maximum_size = Vector2(40, 6)
+offset_left = -19.0
+offset_top = -7.0
+offset_right = 21.0
+offset_bottom = -1.0
+color = Color(0.8509804, 0.30980393, 0.30980393, 1)

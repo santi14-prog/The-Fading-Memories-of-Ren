@@ -1,0 +1,44 @@
+[gd_scene format=3 uid="uid://bpkrquycn5c5b"]
+
+[ext_resource type="Script" uid="uid://bknky6ftij8v8" path="res://projectile.gd" id="1_a85iw"]
+[ext_resource type="Texture2D" uid="uid://ynhlputrhcqd" path="res://combat/windslash_0.png" id="2_2xblw"]
+[ext_resource type="Texture2D" uid="uid://na6ctu5ttm1p" path="res://combat/windslash_1.png" id="3_dac07"]
+[ext_resource type="Texture2D" uid="uid://dx38hbldhcvbr" path="res://combat/windslash_2.png" id="4_0c7x6"]
+[ext_resource type="Texture2D" uid="uid://dprwwcc8njkdj" path="res://combat/windslash_3.png" id="5_wpwum"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ciykk"]
+radius = 21.505814
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ciykk"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_2xblw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_dac07")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_0c7x6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_wpwum")
+}],
+"loop": 1,
+"name": &"wind slash",
+"speed": 40.0
+}]
+
+[node name="Projectile" type="Area2D" unique_id=2032542801]
+script = ExtResource("1_a85iw")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1524875852]
+position = Vector2(3.5, 0.5)
+shape = SubResource("CircleShape2D_ciykk")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1492695701]
+position = Vector2(4, 0)
+sprite_frames = SubResource("SpriteFrames_ciykk")
+animation = &"wind slash"
+autoplay = "wind slash"
+frame_progress = 0.16684578
