@@ -9,6 +9,9 @@
 [ext_resource type="Texture2D" uid="uid://41wadau7jsgx" path="res://sprites/Inimigo/enemy_walk_0.png" id="6_n0g06"]
 [ext_resource type="Texture2D" uid="uid://dba1lt3l2hdnh" path="res://sprites/Inimigo/enemy_walk_1.png" id="7_ar8e5"]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_2xblw"]
+radius = 24.207438
+
 [sub_resource type="SpriteFrames" id="SpriteFrames_ciykk"]
 animations = [{
 "frames": [{
@@ -53,18 +56,20 @@ animations = [{
 "speed": 4.0
 }]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_ciykk"]
-radius = 24.0
+[sub_resource type="CircleShape2D" id="CircleShape2D_6ungf"]
+radius = 24.020824
 
 [node name="Enemy" type="CharacterBody2D" unique_id=854229256]
+collision_layer = 2
+collision_mask = 16
 script = ExtResource("1_hb8ge")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1396646149]
+shape = SubResource("CircleShape2D_2xblw")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1213989894]
 sprite_frames = SubResource("SpriteFrames_ciykk")
 animation = &"death"
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="AnimatedSprite2D" unique_id=1396646149]
-shape = SubResource("CircleShape2D_ciykk")
 
 [node name="HealthBarContainer" type="Node2D" parent="." unique_id=973632553]
 position = Vector2(0, -40)
@@ -85,3 +90,9 @@ offset_top = -7.0
 offset_right = 21.0
 offset_bottom = -1.0
 color = Color(0.8509804, 0.30980393, 0.30980393, 1)
+
+[node name="Hitbox" type="Area2D" parent="." unique_id=80442850]
+collision_layer = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=691282874]
+shape = SubResource("CircleShape2D_6ungf")

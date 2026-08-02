@@ -6,9 +6,9 @@ const ACCELERATION = 2000.0
 const FRICTION = 2200.0
 
 # --- SALTO ---
-const JUMP_VELOCITY = -650.0
+const JUMP_VELOCITY = -780.0
 const JUMP_CUT_MULTIPLIER = 0.5
-const GRAVITY = 900.0
+const GRAVITY = 1300.0
 const COYOTE_TIME = 0.12
 const JUMP_BUFFER = 0.12
 
@@ -20,6 +20,8 @@ const DASH_COOLDOWN = 0.5
 # --- PLANAR ---
 const GLIDE_GRAVITY = 150.0
 const GLIDE_MAX_FALL = 80.0
+const GLIDE_RANGED_GRAVITY_MULTIPLIER = 9.0 # cai mais depressa ao planar e disparar
+const GLIDE_RANGED_MAX_FALL = 500.0
 
 # --- COMBATE ---
 const COMBO_WINDOW = 0.5
@@ -29,12 +31,23 @@ const ATTACK_DAMAGE = [10, 12, 18]
 const PROJECTILE_SCENE: PackedScene = preload("res://projectile.tscn")
 const RANGED_COOLDOWN = 0.6
 const PROJECTILE_OFFSET = 24.0
+const PROJECTILE_SPEED = 900.0
 
-@onready var animated_sprite: AnimatedSprite2D = $AnimatedSprite2D
-@onready var attack_hitbox: Area2D = $AttackHitbox
-@onready var attack_shape: CollisionShape2D = $AttackHitbox/CollisionShape2D
-@onready var slash_visual: AnimatedSprite2D = $AttackHitbox/SlashVisual
-@onready var sword_visual: AnimatedSprite2D = $SwordVisual
+# --- VIDA ---
+const MAX_HEALTH = 100
+
+signal health_changed(current_health: int, max_health: int)
+signal died
+
+@onready var visuals: Node2D = $Visuals
+@onready var animated_sprite: AnimatedSprite2D = $Visuals/AnimatedSprite2D
+@onready var attack_hitbox: Area2D = $Visuals/AttackHitbox
+@onready var attack_shape: CollisionShape2D = $Visuals/AttackHitbox/CollisionShape2D
+@onready var slash_visual: AnimatedSprite2D = $Visuals/AttackHitbox/SlashVisual
+@onready var sword_visual: AnimatedSprite2D = $Visuals/SwordVisual
+@onready var ranged_visual: AnimatedSprite2D = $Visuals/ranged_attack
+@onready var walk_ranged_visual: AnimatedSprite2D = $Visuals/walk_ranged
+@onready var dash_ranged_visual: AnimatedSprite2D = $Visuals/dash_ranged
 
 var coyote_timer := 0.0
 var jump_buffer_timer := 0.0
@@ -52,22 +65,33 @@ var attack_timer := 0.0
 var is_attacking := false
 
 var ranged_cooldown_timer := 0.0
+var is_ranged_playing := false
 
-var sword_base_x := 0.0
-var slash_base_x := 0.0
-var hitbox_base_x := 0.0
+var current_health := MAX_HEALTH
 
 
 func _ready() -> void:
-	sword_base_x = sword_visual.position.x
-	slash_base_x = slash_visual.position.x
-	hitbox_base_x = attack_hitbox.position.x
-
 	attack_hitbox.monitoring = false
-	attack_hitbox.monitorable = false
+	
+	if attack_hitbox.body_entered.is_connected(_on_attack_hit):
+		attack_hitbox.body_entered.disconnect(_on_attack_hit)
 	attack_hitbox.body_entered.connect(_on_attack_hit)
+
+	if attack_hitbox.area_entered.is_connected(_on_attack_area_hit):
+		attack_hitbox.area_entered.disconnect(_on_attack_area_hit)
+	attack_hitbox.area_entered.connect(_on_attack_area_hit)
+
 	slash_visual.visible = false
 	sword_visual.visible = true
+
+	ranged_visual.visible = false
+	ranged_visual.animation_finished.connect(_on_ranged_animation_finished)
+
+	walk_ranged_visual.visible = false
+	dash_ranged_visual.visible = false
+
+	current_health = MAX_HEALTH
+	health_changed.emit(current_health, MAX_HEALTH)
 
 
 func _physics_process(delta: float) -> void:
@@ -91,8 +115,8 @@ func _physics_process(delta: float) -> void:
 		if dash_timer <= 0:
 			is_dashing = false
 		move_and_slide()
-		animated_sprite.play("dash")
-		animated_sprite.flip_h = facing_direction < 0
+		_update_animation()
+		_update_facing()
 		return
 
 	# --- GRAVIDADE / PLANAR ---
@@ -100,8 +124,13 @@ func _physics_process(delta: float) -> void:
 
 	if not is_on_floor():
 		if is_gliding:
-			velocity.y += GLIDE_GRAVITY * delta
-			velocity.y = min(velocity.y, GLIDE_MAX_FALL)
+			var glide_gravity := GLIDE_GRAVITY
+			var glide_max_fall := GLIDE_MAX_FALL
+			if is_ranged_playing:
+				glide_gravity *= GLIDE_RANGED_GRAVITY_MULTIPLIER
+				glide_max_fall = GLIDE_RANGED_MAX_FALL
+			velocity.y += glide_gravity * delta
+			velocity.y = min(velocity.y, glide_max_fall)
 		else:
 			velocity.y += GRAVITY * delta
 		coyote_timer -= delta
@@ -132,6 +161,11 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 	_update_animation()
+	_update_facing()
+
+
+func _update_facing() -> void:
+	visuals.scale.x = facing_direction
 
 
 func _handle_attack_input(delta: float) -> void:
@@ -143,6 +177,7 @@ func _handle_attack_input(delta: float) -> void:
 			attack_hitbox.monitoring = false
 			slash_visual.visible = false
 			sword_visual.visible = true
+			attack_hitbox.position = Vector2(0, 0)
 
 	if Input.is_action_just_pressed("attack"):
 		if not is_attacking or combo_timer > 0:
@@ -151,11 +186,17 @@ func _handle_attack_input(delta: float) -> void:
 			is_attacking = true
 			attack_timer = ATTACK_DURATION
 			combo_timer = COMBO_WINDOW
-			attack_hitbox.position.x = hitbox_base_x * facing_direction
-			attack_hitbox.monitoring = true
+			
 			sword_visual.visible = false
 			slash_visual.visible = true
 			slash_visual.play("swing")
+			attack_hitbox.position = Vector2(35, 0)
+
+			attack_hitbox.monitoring = true
+			for body in attack_hitbox.get_overlapping_bodies():
+				_on_attack_hit(body)
+			for area in attack_hitbox.get_overlapping_areas():
+				_on_attack_area_hit(area)
 
 	if combo_timer <= 0:
 		combo_step = 0
@@ -163,33 +204,117 @@ func _handle_attack_input(delta: float) -> void:
 	# --- ATAQUE À DISTÂNCIA ---
 	if Input.is_action_just_pressed("ranged_attack") and ranged_cooldown_timer <= 0:
 		ranged_cooldown_timer = RANGED_COOLDOWN
+
+		is_ranged_playing = true
+		ranged_visual.visible = true
+		ranged_visual.play("ranged_attack")
+
 		var projectile = PROJECTILE_SCENE.instantiate()
 		get_parent().add_child(projectile)
 		projectile.global_position = global_position + Vector2(PROJECTILE_OFFSET * facing_direction, 0)
+		
 		projectile.direction = facing_direction
+		if "speed" in projectile:
+			projectile.speed = PROJECTILE_SPEED
+
+
+func _on_ranged_animation_finished() -> void:
+	ranged_visual.visible = false
+	walk_ranged_visual.visible = false
+	dash_ranged_visual.visible = false
+	is_ranged_playing = false
+	animated_sprite.visible = true
+
+
+func _on_walk_ranged_finished() -> void:
+	walk_ranged_visual.visible = false
+	is_ranged_playing = false
+
+
+func _on_dash_ranged_finished() -> void:
+	dash_ranged_visual.visible = false
+	is_ranged_playing = false
 
 
 func _on_attack_hit(body: Node2D) -> void:
+	if body == self:
+		return
+
 	if body.has_method("take_damage"):
-		var dmg: int = ATTACK_DAMAGE[combo_step - 1]
-		body.take_damage(dmg)
+		var index: int = clamp(combo_step - 1, 0, ATTACK_DAMAGE.size() - 1)
+		body.take_damage(ATTACK_DAMAGE[index])
+
+
+func _on_attack_area_hit(area: Area2D) -> void:
+	if area == attack_hitbox:
+		return
+
+	if area.has_method("take_damage"):
+		var index: int = clamp(combo_step - 1, 0, ATTACK_DAMAGE.size() - 1)
+		area.take_damage(ATTACK_DAMAGE[index])
+	elif area.get_parent() and area.get_parent().has_method("take_damage"):
+		var index: int = clamp(combo_step - 1, 0, ATTACK_DAMAGE.size() - 1)
+		area.get_parent().take_damage(ATTACK_DAMAGE[index])
+
+
+func take_damage(amount: int) -> void:
+	current_health = max(current_health - amount, 0)
+	health_changed.emit(current_health, MAX_HEALTH)
+	if current_health <= 0:
+		died.emit()
+		_die()
+
+
+func _die() -> void:
+	var respawn_node = get_tree().current_scene.find_child("RespawnPoint", true, false)
+	if respawn_node:
+		global_position = respawn_node.global_position
+	
+	current_health = MAX_HEALTH
+	health_changed.emit(current_health, MAX_HEALTH)
 
 
 func _update_animation() -> void:
+	# --- DASH ---
 	if is_dashing:
+		if is_ranged_playing and dash_ranged_visual:
+			animated_sprite.visible = false
+			ranged_visual.visible = false
+			walk_ranged_visual.visible = false
+			dash_ranged_visual.visible = true
+			dash_ranged_visual.play("dash_ranged")
+		else:
+			animated_sprite.visible = true
+			walk_ranged_visual.visible = false
+			dash_ranged_visual.visible = false
+			ranged_visual.visible = false
+			animated_sprite.play("dash")
 		return
 
+	# --- ATAQUE À DISTÂNCIA ---
+	if is_ranged_playing:
+		if is_on_floor() and velocity.x != 0:
+			ranged_visual.visible = false
+			animated_sprite.visible = false
+			dash_ranged_visual.visible = false
+			walk_ranged_visual.visible = true
+			walk_ranged_visual.play("walk_ranged")
+			return
+		else:
+			ranged_visual.visible = true
+			animated_sprite.visible = false
+			walk_ranged_visual.visible = false
+			dash_ranged_visual.visible = false
+			return
+	else:
+		animated_sprite.visible = true
+		walk_ranged_visual.visible = false
+		dash_ranged_visual.visible = false
+
+	# --- MOVIMENTO NORMAL ---
 	if not is_on_floor():
 		animated_sprite.play("fall")
 	elif velocity.x != 0:
 		animated_sprite.play("walk")
 	else:
 		animated_sprite.play("idle")
-
-	animated_sprite.flip_h = facing_direction < 0
-
-	sword_visual.flip_h = facing_direction < 0
-	sword_visual.position.x = sword_base_x * facing_direction
-
-	slash_visual.flip_h = facing_direction < 0
-	slash_visual.position.x = slash_base_x * facing_direction
