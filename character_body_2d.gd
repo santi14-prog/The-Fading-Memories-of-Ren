@@ -20,7 +20,7 @@ const DASH_COOLDOWN = 0.5
 # --- PLANAR ---
 const GLIDE_GRAVITY = 150.0
 const GLIDE_MAX_FALL = 80.0
-const GLIDE_RANGED_GRAVITY_MULTIPLIER = 9.0 # cai mais depressa ao planar e disparar
+const GLIDE_RANGED_GRAVITY_MULTIPLIER = 9.0
 const GLIDE_RANGED_MAX_FALL = 500.0
 
 # --- COMBATE ---
@@ -32,6 +32,11 @@ const PROJECTILE_SCENE: PackedScene = preload("res://projectile.tscn")
 const RANGED_COOLDOWN = 0.6
 const PROJECTILE_OFFSET = 24.0
 const PROJECTILE_SPEED = 900.0
+
+# --- KNOCKBACK ---
+const KNOCKBACK_FORCE = 320.0
+const KNOCKBACK_UP = -180.0
+const HIT_STUN_TIME = 0.15
 
 # --- VIDA ---
 const MAX_HEALTH = 100
@@ -69,10 +74,15 @@ var is_ranged_playing := false
 
 var current_health := MAX_HEALTH
 
+var hit_stun_timer := 0.0
+
+# --- MORTE ---
+var is_dead := false
+
 
 func _ready() -> void:
 	attack_hitbox.monitoring = false
-	
+
 	if attack_hitbox.body_entered.is_connected(_on_attack_hit):
 		attack_hitbox.body_entered.disconnect(_on_attack_hit)
 	attack_hitbox.body_entered.connect(_on_attack_hit)
@@ -90,11 +100,28 @@ func _ready() -> void:
 	walk_ranged_visual.visible = false
 	dash_ranged_visual.visible = false
 
+	animated_sprite.animation_finished.connect(_on_animated_sprite_animation_finished)
+
+	if animated_sprite.sprite_frames and animated_sprite.sprite_frames.has_animation("died"):
+		animated_sprite.sprite_frames.set_animation_loop("died", false)
+
 	current_health = MAX_HEALTH
 	health_changed.emit(current_health, MAX_HEALTH)
 
 
 func _physics_process(delta: float) -> void:
+	if is_dead:
+		return
+
+	# --- HIT STUN / KNOCKBACK ---
+	if hit_stun_timer > 0:
+		hit_stun_timer -= delta
+		velocity.y += GRAVITY * delta
+		move_and_slide()
+		_update_animation()
+		_update_facing()
+		return
+
 	dash_cooldown_timer -= delta
 	combo_timer -= delta
 	ranged_cooldown_timer -= delta
@@ -178,6 +205,7 @@ func _handle_attack_input(delta: float) -> void:
 			slash_visual.visible = false
 			sword_visual.visible = true
 			attack_hitbox.position = Vector2(0, 0)
+			attack_hitbox.rotation_degrees = 0
 
 	if Input.is_action_just_pressed("attack"):
 		if not is_attacking or combo_timer > 0:
@@ -186,11 +214,33 @@ func _handle_attack_input(delta: float) -> void:
 			is_attacking = true
 			attack_timer = ATTACK_DURATION
 			combo_timer = COMBO_WINDOW
-			
+
 			sword_visual.visible = false
 			slash_visual.visible = true
 			slash_visual.play("swing")
-			attack_hitbox.position = Vector2(35, 0)
+
+			print("aim_up pressed? ", Input.is_action_pressed("aim_up"))
+			print("aim_down pressed? ", Input.is_action_pressed("aim_down"))
+
+			if Input.is_action_pressed("aim_up"):
+				attack_hitbox.position = Vector2(0, -35)
+				attack_hitbox.rotation_degrees = -90
+			elif Input.is_action_pressed("aim_down"):
+				attack_hitbox.position = Vector2(0, 35)
+				attack_hitbox.rotation_degrees = 90
+			else:
+				attack_hitbox.position = Vector2(35, 0)
+				attack_hitbox.rotation_degrees = 0
+
+			if Input.is_action_pressed("aim_up"):
+				attack_hitbox.position = Vector2(0, -35)
+				attack_hitbox.rotation_degrees = -90
+			elif Input.is_action_pressed("aim_down"):
+				attack_hitbox.position = Vector2(0, 35)
+				attack_hitbox.rotation_degrees = 90
+			else:
+				attack_hitbox.position = Vector2(35, 0)
+				attack_hitbox.rotation_degrees = 0
 
 			attack_hitbox.monitoring = true
 			for body in attack_hitbox.get_overlapping_bodies():
@@ -212,7 +262,7 @@ func _handle_attack_input(delta: float) -> void:
 		var projectile = PROJECTILE_SCENE.instantiate()
 		get_parent().add_child(projectile)
 		projectile.global_position = global_position + Vector2(PROJECTILE_OFFSET * facing_direction, 0)
-		
+
 		projectile.direction = facing_direction
 		if "speed" in projectile:
 			projectile.speed = PROJECTILE_SPEED
@@ -257,21 +307,75 @@ func _on_attack_area_hit(area: Area2D) -> void:
 		area.get_parent().take_damage(ATTACK_DAMAGE[index])
 
 
-func take_damage(amount: int) -> void:
+func take_damage(amount: int, source_position: Vector2 = global_position) -> void:
+	if is_dead:
+		return
+
 	current_health = max(current_health - amount, 0)
 	health_changed.emit(current_health, MAX_HEALTH)
+
 	if current_health <= 0:
 		died.emit()
+		_start_death()
+		return
+
+	var knock_dir: float = sign(global_position.x - source_position.x)
+	if knock_dir == 0:
+		knock_dir = -facing_direction
+	velocity.x = knock_dir * KNOCKBACK_FORCE
+	velocity.y = KNOCKBACK_UP
+	hit_stun_timer = HIT_STUN_TIME
+
+
+func _start_death() -> void:
+	is_dead = true
+
+	is_attacking = false
+	is_dashing = false
+	is_ranged_playing = false
+	velocity = Vector2.ZERO
+
+	attack_hitbox.monitoring = false
+	slash_visual.visible = false
+	sword_visual.visible = false
+	ranged_visual.visible = false
+	walk_ranged_visual.visible = false
+	dash_ranged_visual.visible = false
+
+	animated_sprite.visible = true
+	animated_sprite.play("died")
+
+	var frames := animated_sprite.sprite_frames
+	if frames and frames.has_animation("died"):
+		var frame_count := frames.get_frame_count("died")
+		var fps := frames.get_animation_speed("died")
+		if fps <= 0:
+			fps = 1.0
+		var duration := (frame_count / fps) + 0.2
+		await get_tree().create_timer(duration).timeout
+		if is_dead:
+			_die()
+
+
+func _on_animated_sprite_animation_finished() -> void:
+	if animated_sprite.animation == "died":
 		_die()
 
 
 func _die() -> void:
+	if not is_dead:
+		return
+
 	var respawn_node = get_tree().current_scene.find_child("RespawnPoint", true, false)
 	if respawn_node:
 		global_position = respawn_node.global_position
-	
+
 	current_health = MAX_HEALTH
 	health_changed.emit(current_health, MAX_HEALTH)
+
+	sword_visual.visible = true
+	is_dead = false
+	animated_sprite.play("idle")
 
 
 func _update_animation() -> void:
