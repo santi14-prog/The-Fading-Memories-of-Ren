@@ -110,6 +110,7 @@ sprite_frames = SubResource("SpriteFrames_ciykk")
 animation = &"death"
 
 [node name="AnimatedSprite2D2" type="AnimatedSprite2D" parent="." unique_id=730508378]
+visible = false
 position = Vector2(-1, -16)
 sprite_frames = SubResource("SpriteFrames_6ungf")
 animation = &"jump"
