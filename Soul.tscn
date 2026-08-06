@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://cwvv8gvkvvtui"]
+
+[ext_resource type="Script" uid="uid://lf2pcjggw07o" path="res://Gds/Soul.gd" id="1_l0r5o"]
+[ext_resource type="Texture2D" uid="uid://dd33x8p3tg51o" path="res://Gds/transferir (14).png" id="2_0iudp"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lrhq4"]
+radius = 11.0
+height = 34.0
+
+[node name="Area2D" type="Area2D" unique_id=1727191338]
+script = ExtResource("1_l0r5o")
+magnet_radius = 260.0
+base_scale = 0.12
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1989187661]
+position = Vector2(-29, -32)
+scale = Vector2(0.07729774, 0.093603745)
+texture = ExtResource("2_0iudp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1784906570]
+position = Vector2(-29, -31)
+shape = SubResource("CapsuleShape2D_lrhq4")

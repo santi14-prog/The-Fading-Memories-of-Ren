@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://brj6681ch40ny" path="res://enemy.gd" id="1_hb8ge"]
 [ext_resource type="Texture2D" uid="uid://bac82ki2co0u0" path="res://sprites/Inimigo/enemy_death_0.png" id="1_wujgv"]
+[ext_resource type="PackedScene" uid="uid://cwvv8gvkvvtui" path="res://Soul.tscn" id="2_e1ltt"]
 [ext_resource type="Texture2D" uid="uid://dxn14uxeqnamq" path="res://sprites/Inimigo/enemy_death_1.png" id="2_hb8ge"]
 [ext_resource type="Texture2D" uid="uid://ds8li6hc31olq" path="res://sprites/Inimigo/enemy_hurt_0.png" id="3_e1ltt"]
 [ext_resource type="Texture2D" uid="uid://c1sbmo5hvcpqn" path="res://sprites/Inimigo/enemy_idle_0.png" id="4_dxifv"]
@@ -101,6 +102,7 @@ radius = 24.020824
 collision_layer = 2
 collision_mask = 16
 script = ExtResource("1_hb8ge")
+soul_scene = ExtResource("2_e1ltt")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1396646149]
 shape = SubResource("CircleShape2D_2xblw")
@@ -111,7 +113,6 @@ animation = &"death"
 
 [node name="AnimatedSprite2D2" type="AnimatedSprite2D" parent="." unique_id=730508378]
 visible = false
-position = Vector2(-1, -16)
 sprite_frames = SubResource("SpriteFrames_6ungf")
 animation = &"jump"
 frame = 5

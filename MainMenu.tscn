@@ -3,7 +3,11 @@
 [ext_resource type="VideoStream" uid="uid://bmx17ojwdnyh1" path="res://sprites/consegues_aumentar_a_duracao_d-_online-video-cutter.com_.ogv" id="1_eiy7p"]
 [ext_resource type="Script" uid="uid://b2r8vtsp7453b" path="res://main_menu.gd" id="1_h7a2f"]
 [ext_resource type="FontFile" uid="uid://oktpf3gfrarw" path="res://sprites/PixelifySans-VariableFont_wght.ttf" id="2_eiy7p"]
-[ext_resource type="Texture2D" uid="uid://b6ciyq43om3n6" path="res://sprites/transferir (10).png" id="2_qoqlk"]
+[ext_resource type="Texture2D" uid="uid://dp0btwq8lpo6c" path="res://sprites/transferir (11).png" id="3_qoqlk"]
+[ext_resource type="Texture2D" uid="uid://d1ihaoub3iwgy" path="res://Gds/transferir (12).png" id="4_7r1g0"]
+[ext_resource type="Script" uid="uid://b330w4u7v46e" path="res://v_box_container.gd" id="5_iwfq2"]
+[ext_resource type="AudioStream" uid="uid://bv6mdcht5n0sg" path="res://Gds/hover_sound.mp3" id="7_e2xy7"]
+[ext_resource type="AudioStream" uid="uid://cvtrpp6vo3brj" path="res://Gds/click_sound.mp3" id="8_fimr5"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eiy7p"]
 bg_color = Color(0.101960786, 0.08235294, 0.2, 1)
@@ -69,11 +73,38 @@ loop = true
 
 [node name="TextureRect" type="TextureRect" parent="." unique_id=787722969]
 layout_mode = 0
-offset_left = 42.0
-offset_top = 859.0
-offset_right = 262.0
-offset_bottom = 1051.0
-texture = ExtResource("2_qoqlk")
+offset_left = 24.0
+offset_top = 927.0
+offset_right = 276.0
+offset_bottom = 1055.0
+texture = ExtResource("3_qoqlk")
+expand_mode = 1
+
+[node name="TextureRect2" type="TextureRect" parent="." unique_id=1036442682]
+layout_mode = 0
+offset_left = 583.0
+offset_top = 619.0
+offset_right = 1342.0
+offset_bottom = 936.0
+texture = ExtResource("4_7r1g0")
+expand_mode = 1
+
+[node name="TextureRect3" type="TextureRect" parent="." unique_id=848932124]
+layout_mode = 0
+offset_left = 581.0
+offset_top = 721.0
+offset_right = 1340.0
+offset_bottom = 1038.0
+texture = ExtResource("4_7r1g0")
+expand_mode = 1
+
+[node name="TextureRect4" type="TextureRect" parent="." unique_id=596070141]
+layout_mode = 0
+offset_left = 580.0
+offset_top = 827.0
+offset_right = 1339.0
+offset_bottom = 1144.0
+texture = ExtResource("4_7r1g0")
 expand_mode = 1
 
 [node name="Label" type="Label" parent="." unique_id=794361764]
@@ -100,6 +131,9 @@ offset_top = 741.0
 offset_right = 1162.0
 offset_bottom = 1025.0
 theme_override_constants/separation = 40
+script = ExtResource("5_iwfq2")
+hover_sound = ExtResource("7_e2xy7")
+click_sound = ExtResource("8_fimr5")
 
 [node name="BtnNewGame" type="Button" parent="VBoxContainer" unique_id=1387855056]
 custom_minimum_size = Vector2(400, 70)
@@ -130,3 +164,5 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_eiy7p")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_h7a2f")
 theme_override_styles/hover = SubResource("StyleBoxFlat_qoqlk")
 text = "Sair"
+
+[node name="SfxPlayer" type="AudioStreamPlayer" parent="." unique_id=449468170]
