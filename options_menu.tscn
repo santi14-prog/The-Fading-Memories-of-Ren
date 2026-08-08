@@ -1,0 +1,87 @@
+[gd_scene format=3 uid="uid://bnlibng3clqv7"]
+
+[ext_resource type="Script" uid="uid://c4aqim44co2j7" path="res://options_menu.gd" id="1_lbr8e"]
+[ext_resource type="AudioStream" uid="uid://bv6mdcht5n0sg" path="res://Gds/hover_sound.mp3" id="2_4gmlt"]
+[ext_resource type="FontFile" uid="uid://oktpf3gfrarw" path="res://sprites/PixelifySans-VariableFont_wght.ttf" id="2_ogda5"]
+[ext_resource type="AudioStream" uid="uid://cvtrpp6vo3brj" path="res://Gds/click_sound.mp3" id="3_ogda5"]
+
+[node name="OptionsMenu" type="Control" unique_id=642719949]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_lbr8e")
+pixel_font = ExtResource("2_ogda5")
+hover_sound = ExtResource("2_4gmlt")
+click_sound = ExtResource("3_ogda5")
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1896546385]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer" unique_id=1032863192]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer" unique_id=1746592274]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer" unique_id=1774529048]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=778388209]
+layout_mode = 2
+
+[node name="TabContainer" type="TabContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer" unique_id=877073754]
+layout_mode = 2
+current_tab = 1
+
+[node name="Geral" type="Control" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer" unique_id=851053933]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 0
+
+[node name="Audio" type="Control" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer" unique_id=1075395555]
+layout_mode = 2
+metadata/_tab_index = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Audio" unique_id=1810294835]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Graficos" type="Control" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer" unique_id=1118786009]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="Controlos" type="Control" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer" unique_id=1617065878]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Controlos" unique_id=463962336]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Extras" type="Control" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer" unique_id=1460378591]
+visible = false
+layout_mode = 2
+metadata/_tab_index = 4
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=549557491]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="BtnBack" type="Button" parent="." unique_id=1662575529]
+layout_mode = 0
+offset_left = 200.0
+offset_top = 942.0
+offset_right = 336.0
+offset_bottom = 950.0
+text = "Voltar"

@@ -9,14 +9,23 @@ const MARKER_OFFSET := 24.0
 const BUTTON_MIN_HEIGHT := 64.0
 const BUTTON_FONT_SIZE := 34   # tamanho do texto do próprio botão (0 = não mexe)
 
+# Espaçamento entre botões — fixo, para não depender do tema por defeito
+const BUTTON_SEPARATION := 40
+
+# Contorno do texto — melhora a leitura contra fundos claros
+const OUTLINE_COLOR := Color(0.05, 0.05, 0.08, 0.9)
+const OUTLINE_SIZE := 6
+
 # Sons — arrasta os ficheiros no Inspector deste nó
 @export var hover_sound: AudioStream
 @export var click_sound: AudioStream
 
 @onready var sfx_player: AudioStreamPlayer = get_tree().current_scene.find_child("SfxPlayer", true, false)
 
+@export var pixel_font: Font
 
 func _ready() -> void:
+	add_theme_constant_override("separation", BUTTON_SEPARATION)
 	for btn in get_children():
 		if btn is Button:
 			_setup_button(btn)
@@ -40,6 +49,10 @@ func _setup_button(btn: Button) -> void:
 	btn.add_theme_color_override("font_hover_color", COLOR_HOVER)
 	btn.add_theme_color_override("font_pressed_color", Color.WHITE)
 
+	# contorno para destacar o texto do fundo (floresta clara/escura)
+	btn.add_theme_color_override("font_outline_color", OUTLINE_COLOR)
+	btn.add_theme_constant_override("outline_size", OUTLINE_SIZE)
+
 	# aumenta o botão: altura mínima maior + texto maior
 	btn.custom_minimum_size.y = BUTTON_MIN_HEIGHT
 	if BUTTON_FONT_SIZE > 0:
@@ -59,6 +72,8 @@ func _setup_button(btn: Button) -> void:
 	for marker in [marker_left, marker_right]:
 		marker.add_theme_color_override("font_color", COLOR_HOVER)
 		marker.add_theme_font_size_override("font_size", font_size)
+		if pixel_font:
+			marker.add_theme_font_override("font", pixel_font)
 		marker.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		marker.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		marker.modulate.a = 0.0

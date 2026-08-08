@@ -12,12 +12,17 @@ config_version=5
 
 config/name="The Fading Memories Of Ren Main"
 run/main_scene="uid://6bfry5d0qkv5"
-run/disable_stdout=true
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
+[audio]
+
+buses/default_bus_layout="uid://bsvs3m8hv8ymc"
+
 [autoload]
 
+PauseMenu="*uid://do58ug70pes6n"
+SettingsManager="*uid://cq70ab700l2fr"
 SoulManager="*uid://ckongwm3if0yg"
 
 [display]

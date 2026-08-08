@@ -1,7 +1,7 @@
 extends CharacterBody2D
 
 # --- MOVIMENTO ---
-const SPEED = 320.0
+const SPEED = 400.0
 const ACCELERATION = 2000.0
 const FRICTION = 2200.0
 
@@ -14,7 +14,7 @@ const JUMP_BUFFER = 0.12
 const MAX_JUMPS = 2
 
 # --- DASH ---
-const DASH_SPEED = 700.0
+const DASH_SPEED = 900.0
 const DASH_DURATION = 0.2
 const DASH_COOLDOWN = 0.75
 
@@ -40,7 +40,7 @@ const PROJECTILE_SPEED = 1200.0
 # --- KNOCKBACK ---
 const KNOCKBACK_FORCE = 320.0
 const KNOCKBACK_UP = -180.0
-const HIT_STUN_TIME = 0.15
+const HIT_STUN_TIME = 0.20
 
 # --- VIDA ---
 const MAX_HEALTH = 100
@@ -96,6 +96,7 @@ var is_dead := false
 
 
 func _ready() -> void:
+	print("TESTE 123")
 	if is_instance_valid(attack_hitbox):
 		attack_hitbox.monitoring = false
 

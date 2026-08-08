@@ -2,9 +2,12 @@
 
 [ext_resource type="Script" uid="uid://c0f28mbsxdlq4" path="res://pause_menu.gd" id="1_nwcfo"]
 [ext_resource type="Script" uid="uid://b330w4u7v46e" path="res://v_box_container.gd" id="2_05uyy"]
+[ext_resource type="Texture2D" uid="uid://df0lxn2v0vaji" path="res://Gds/transferir (19).png" id="2_mxa3g"]
 [ext_resource type="FontFile" uid="uid://oktpf3gfrarw" path="res://sprites/PixelifySans-VariableFont_wght.ttf" id="3_05uyy"]
+[ext_resource type="Texture2D" uid="uid://dv7lydkl2088g" path="res://Gds/transferir (18).png" id="3_e8sti"]
 [ext_resource type="AudioStream" uid="uid://cvtrpp6vo3brj" path="res://Gds/click_sound.mp3" id="4_2nc7s"]
 [ext_resource type="AudioStream" uid="uid://bv6mdcht5n0sg" path="res://Gds/hover_sound.mp3" id="4_p81d2"]
+[ext_resource type="AudioStream" uid="uid://ci7rpje60koq1" path="res://music/abrirMenuPausa.mp3" id="8_e8sti"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p81d2"]
 bg_color = Color(0.101960786, 0.08235294, 0.2, 1)
@@ -47,6 +50,8 @@ bg_color = Color(0.6, 0.6, 0.6, 0)
 
 [node name="PauseMenu" type="CanvasLayer" unique_id=1119788414]
 script = ExtResource("1_nwcfo")
+open_sound = ExtResource("8_e8sti")
+close_sound = ExtResource("8_e8sti")
 
 [node name="Control" type="Control" parent="." unique_id=692765472]
 layout_mode = 3
@@ -58,20 +63,32 @@ grow_vertical = 2
 
 [node name="ColorRect" type="ColorRect" parent="Control" unique_id=644218316]
 layout_mode = 0
-offset_right = 1926.0
-offset_bottom = 1085.0
+offset_left = -4.0
+offset_top = -12.0
+offset_right = 1945.0
+offset_bottom = 1093.0
 color = Color(0, 0, 0, 0.5921569)
+
+[node name="FrameTop" type="TextureRect" parent="Control" unique_id=1398873249]
+layout_mode = 0
+offset_left = 816.0
+offset_top = 333.0
+offset_right = 1136.0
+offset_bottom = 427.0
+texture = ExtResource("2_mxa3g")
+expand_mode = 1
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Control" unique_id=1124081913]
 layout_mode = 0
-offset_left = 773.0
-offset_top = 419.0
-offset_right = 1173.0
-offset_bottom = 709.0
+offset_left = 776.0
+offset_top = 418.0
+offset_right = 1176.0
+offset_bottom = 708.0
 theme_override_constants/separation = 40
 script = ExtResource("2_05uyy")
 hover_sound = ExtResource("4_p81d2")
 click_sound = ExtResource("4_2nc7s")
+pixel_font = ExtResource("3_05uyy")
 
 [node name="BtnResume" type="Button" parent="Control/VBoxContainer" unique_id=1359885052]
 custom_minimum_size = Vector2(400, 70)
@@ -81,7 +98,7 @@ theme_override_font_sizes/font_size = 34
 theme_override_styles/normal = SubResource("StyleBoxFlat_p81d2")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_2nc7s")
 theme_override_styles/hover = SubResource("StyleBoxFlat_d3xb4")
-text = "Retomar
+text = "  Retomar
 "
 
 [node name="BtnOptions" type="Button" parent="Control/VBoxContainer" unique_id=1821992536]
@@ -103,6 +120,15 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_p81d2")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_2nc7s")
 theme_override_styles/hover = SubResource("StyleBoxFlat_d3xb4")
 text = "Sair"
+
+[node name="FrameBottom" type="TextureRect" parent="Control" unique_id=1026001180]
+layout_mode = 0
+offset_left = 821.0
+offset_top = 692.0
+offset_right = 1134.0
+offset_bottom = 785.0
+texture = ExtResource("3_e8sti")
+expand_mode = 1
 
 [node name="QuitConfirmPanel" type="Panel" parent="Control" unique_id=374722911]
 layout_mode = 0
@@ -146,3 +172,9 @@ theme_override_font_sizes/font_size = 20
 text = "Cancelar"
 
 [node name="SfxPlayer" type="AudioStreamPlayer" parent="." unique_id=376540741]
+bus = &"SFX"
+
+[node name="MenuSfxPlayer" type="AudioStreamPlayer" parent="." unique_id=130281099]
+stream = ExtResource("8_e8sti")
+volume_db = -16.206
+bus = &"Music"
