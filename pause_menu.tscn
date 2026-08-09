@@ -153,7 +153,7 @@ text = "Queres sair para o menu principal?"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Control/QuitConfirmPanel/VBoxContainer" unique_id=1008307400]
 layout_mode = 2
-theme_override_constants/separation = 90
+theme_override_constants/separation = 175
 alignment = 1
 script = ExtResource("2_05uyy")
 hover_sound = ExtResource("4_p81d2")

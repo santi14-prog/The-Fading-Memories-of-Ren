@@ -35,6 +35,8 @@ const OPTIONS_MENU_SCENE: PackedScene = preload("res://options_menu.tscn")
 @onready var btn_quit_yes: Button = $Control/QuitConfirmPanel/VBoxContainer/HBoxContainer/BtnQuitYes
 @onready var btn_quit_cancel: Button = $Control/QuitConfirmPanel/VBoxContainer/HBoxContainer/BtnQuitCancel
 
+@onready var quit_confirm_label: Label = $Control/QuitConfirmPanel/VBoxContainer/Label
+
 # Frames decorativos
 @onready var frame_top: TextureRect = $Control/FrameTop
 @onready var frame_bottom: TextureRect = $Control/FrameBottom
@@ -91,13 +93,38 @@ func _ready() -> void:
 	btn_quit.pressed.connect(_on_quit_pressed)
 	btn_quit_yes.pressed.connect(_on_quit_confirmed)
 	btn_quit_cancel.pressed.connect(_on_quit_cancelled)
+	
+	_refresh_language()
+	if not SettingsManager.language_changed.is_connected(_on_language_changed):
+		SettingsManager.language_changed.connect(_on_language_changed)
+	
+	
+func _on_language_changed(_language_code: String = "") -> void:
+	_refresh_language()
 
+
+func _refresh_language() -> void:
+	btn_resume.text = SettingsManager.translate("resume")
+	btn_options.text = SettingsManager.translate("options")
+	btn_quit.text = SettingsManager.translate("quit")
+	quit_confirm_label.text = SettingsManager.translate("quit_confirm_message")
+	btn_quit_yes.text = SettingsManager.translate("yes")
+	btn_quit_cancel.text = SettingsManager.translate("no")
+	
+func _exit_tree() -> void:
+	if SettingsManager.language_changed.is_connected(_on_language_changed):
+		SettingsManager.language_changed.disconnect(_on_language_changed)
 
 func _unhandled_input(event: InputEvent) -> void:
 	# Enquanto o OptionsMenu estiver aberto, o Esc não faz nada aqui — só o
 	# botão "Voltar" dele é que fecha esse menu. Isto evita depender da ordem
 	# de propagação do evento entre os dois scripts.
 	if _options_menu_open:
+		return
+
+	# Não permite abrir (nem alternar) o menu de pausa enquanto se está no
+	# menu principal.
+	if get_tree().current_scene and get_tree().current_scene.scene_file_path == MAIN_MENU_SCENE_PATH:
 		return
 
 	var is_cancel: bool = event.is_action_pressed("ui_cancel")
@@ -227,3 +254,4 @@ func _animate_menu_box_out(quick: bool = false, keep_visible: bool = false) -> v
 
 	if not keep_visible:
 		tween.finished.connect(func(): menu_box.visible = false)
+		
