@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://csvqvjssi6x4l"]
+
+[ext_resource type="Texture2D" uid="uid://ca6eatlgknc43" path="res://combat/transferir (22).png" id="1_kd173"]
+[ext_resource type="Script" uid="uid://drjab6ekanam1" path="res://mask_icon.gd" id="1_y2urp"]
+
+[node name="MaskIcon" type="Node2D" unique_id=165784140]
+script = ExtResource("1_y2urp")
+
+[node name="Idle" type="Sprite2D" parent="." unique_id=783741649]
+position = Vector2(-184.75, -181.5)
+scale = Vector2(0.4443609, 0.4328125)
+texture = ExtResource("1_kd173")

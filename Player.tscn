@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://iblajd36j4ob" path="res://sprites/transferir (5).png" id="1_rv870"]
 [ext_resource type="Script" uid="uid://c716emed45qiy" path="res://Gds/SoulCounterHUD.gd" id="1_xmpta"]
 [ext_resource type="Texture2D" uid="uid://bm7d3gplb5fa1" path="res://sprites/arma_16x16_8x_1.png" id="2_d6rpx"]
+[ext_resource type="PackedScene" uid="uid://csvqvjssi6x4l" path="res://mask_icon.tscn" id="2_gueye"]
 [ext_resource type="FontFile" uid="uid://oktpf3gfrarw" path="res://sprites/PixelifySans-VariableFont_wght.ttf" id="2_p01ps"]
 [ext_resource type="Texture2D" uid="uid://dbl8cb1ox4kx2" path="res://sprites/dash_spritesheet_rescaled.png" id="3_3tkgg"]
 [ext_resource type="Texture2D" uid="uid://dhrmp78v5wd1u" path="res://sprites/moldura dash.png" id="3_3vjad"]
@@ -5383,22 +5384,62 @@ close_sound = null
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=695557017]
 
+[node name="MaskIcons" type="HBoxContainer" parent="UI" unique_id=1313444394]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="MaskIcon" parent="UI/MaskIcons" unique_id=165784140 instance=ExtResource("2_gueye")]
+position = Vector2(262, 235)
+
+[node name="MaskIcons2" type="HBoxContainer" parent="UI" unique_id=908607527]
+offset_left = 92.0
+offset_right = 132.0
+offset_bottom = 40.0
+
+[node name="MaskIcon" parent="UI/MaskIcons2" unique_id=853318225 instance=ExtResource("2_gueye")]
+position = Vector2(262, 235)
+
+[node name="MaskIcons3" type="HBoxContainer" parent="UI" unique_id=29351853]
+offset_left = 181.0
+offset_right = 221.0
+offset_bottom = 40.0
+
+[node name="MaskIcon" parent="UI/MaskIcons3" unique_id=1874840974 instance=ExtResource("2_gueye")]
+position = Vector2(262, 235)
+
+[node name="MaskIcons4" type="HBoxContainer" parent="UI" unique_id=1726757180]
+offset_left = 273.0
+offset_right = 313.0
+offset_bottom = 40.0
+
+[node name="MaskIcon" parent="UI/MaskIcons4" unique_id=889472357 instance=ExtResource("2_gueye")]
+position = Vector2(262, 235)
+
+[node name="MaskIcons5" type="HBoxContainer" parent="UI" unique_id=1350385288]
+offset_left = 364.0
+offset_right = 404.0
+offset_bottom = 40.0
+
+[node name="MaskIcon" parent="UI/MaskIcons5" unique_id=1614060400 instance=ExtResource("2_gueye")]
+position = Vector2(262, 235)
+
 [node name="TextureRect" type="TextureRect" parent="UI" unique_id=315179483]
-offset_left = 533.0
-offset_top = 15.0
-offset_right = 698.0
-offset_bottom = 92.0
+offset_left = 484.0
+offset_top = 17.0
+offset_right = 649.0
+offset_bottom = 94.0
 texture = ExtResource("1_mrbh7")
 expand_mode = 1
 
 [node name="Label" type="Label" parent="UI" unique_id=1497038945]
-offset_left = 661.0
-offset_top = 38.0
-offset_right = 701.0
-offset_bottom = 61.0
+offset_left = 612.0
+offset_top = 40.0
+offset_right = 652.0
+offset_bottom = 63.0
 script = ExtResource("1_xmpta")
 
 [node name="HealthBar" type="Control" parent="UI" unique_id=1579268047]
+visible = false
 layout_mode = 3
 anchors_preset = 0
 offset_left = 152.0
@@ -5406,7 +5447,6 @@ offset_top = 197.0
 offset_right = 192.0
 offset_bottom = 237.0
 script = ExtResource("1_d6rpx")
-player_path = NodePath("../../Ren")
 
 [node name="TrailFill" type="ProgressBar" parent="UI/HealthBar" unique_id=2136042387]
 layout_mode = 0
@@ -5436,10 +5476,10 @@ texture = ExtResource("1_rv870")
 [node name="DashCooldownIcon" type="Control" parent="UI" unique_id=420730261]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 361.0
-offset_top = -421.0
-offset_right = 401.0
-offset_bottom = -381.0
+offset_left = 1012.0
+offset_top = -514.0
+offset_right = 1052.0
+offset_bottom = -474.0
 script = ExtResource("3_yt0h1")
 
 [node name="IconFrame" type="TextureRect" parent="UI/DashCooldownIcon" unique_id=1170713743]
@@ -5466,10 +5506,10 @@ expand_mode = 1
 [node name="ProjectileCooldownIcon" type="Control" parent="UI" unique_id=499929730]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 361.0
-offset_top = -421.0
-offset_right = 401.0
-offset_bottom = -381.0
+offset_left = 1012.0
+offset_top = -514.0
+offset_right = 1052.0
+offset_bottom = -474.0
 script = ExtResource("7_ictha")
 
 [node name="IconFrameFeather" type="TextureRect" parent="UI/ProjectileCooldownIcon" unique_id=997768196]

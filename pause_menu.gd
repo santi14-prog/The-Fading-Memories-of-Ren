@@ -32,6 +32,7 @@ const OPTIONS_MENU_SCENE: PackedScene = preload("res://options_menu.tscn")
 @onready var btn_quit: Button = $Control/VBoxContainer/BtnQuit
 
 @onready var quit_confirm_panel: Panel = $Control/QuitConfirmPanel
+@onready var quit_confirm_vbox: VBoxContainer = $Control/QuitConfirmPanel/VBoxContainer
 @onready var btn_quit_yes: Button = $Control/QuitConfirmPanel/VBoxContainer/HBoxContainer/BtnQuitYes
 @onready var btn_quit_cancel: Button = $Control/QuitConfirmPanel/VBoxContainer/HBoxContainer/BtnQuitCancel
 
@@ -56,6 +57,9 @@ const FRAME_FADE_TIME := 0.15
 const MENU_BOX_SLIDE_DISTANCE := 30.0
 const FRAME_GAP := 16.0  # espaço entre a moldura e o menu_box
 
+# Espaço à volta do texto/botões dentro do QuitConfirmPanel — ajusta ao gosto
+const QUIT_PANEL_PADDING := Vector2(40, 30)
+
 var _is_open: bool = false
 var _options_menu_open: bool = false
 
@@ -66,6 +70,26 @@ func _ready() -> void:
 
 	control.visible = false
 	quit_confirm_panel.visible = false
+
+	# força o painel a estar ancorado ao centro do ecrã, independentemente
+	# do que estiver configurado na cena — o resto do código assume isto
+	quit_confirm_panel.set_anchors_preset(Control.PRESET_CENTER, false)
+	quit_confirm_panel.anchor_left = 0.5
+	quit_confirm_panel.anchor_right = 0.5
+	quit_confirm_panel.anchor_top = 0.5
+	quit_confirm_panel.anchor_bottom = 0.5
+	quit_confirm_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	quit_confirm_panel.grow_vertical = Control.GROW_DIRECTION_BOTH
+
+	# centra o texto e os botões dentro do painel
+	quit_confirm_vbox.alignment = BoxContainer.ALIGNMENT_CENTER
+	quit_confirm_vbox.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	quit_confirm_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+	var quit_hbox: HBoxContainer = btn_quit_yes.get_parent() as HBoxContainer
+	if quit_hbox:
+		quit_hbox.alignment = BoxContainer.ALIGNMENT_CENTER
+		quit_hbox.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 
 	# guarda as posições finais definidas na cena, para animar a partir delas
 	_menu_box_rest_pos = menu_box.position
@@ -93,12 +117,12 @@ func _ready() -> void:
 	btn_quit.pressed.connect(_on_quit_pressed)
 	btn_quit_yes.pressed.connect(_on_quit_confirmed)
 	btn_quit_cancel.pressed.connect(_on_quit_cancelled)
-	
+
 	_refresh_language()
 	if not SettingsManager.language_changed.is_connected(_on_language_changed):
 		SettingsManager.language_changed.connect(_on_language_changed)
-	
-	
+
+
 func _on_language_changed(_language_code: String = "") -> void:
 	_refresh_language()
 
@@ -110,10 +134,27 @@ func _refresh_language() -> void:
 	quit_confirm_label.text = SettingsManager.translate("quit_confirm_message")
 	btn_quit_yes.text = SettingsManager.translate("yes")
 	btn_quit_cancel.text = SettingsManager.translate("no")
-	
+	_center_quit_confirm_panel()
+
+
+func _center_quit_confirm_panel() -> void:
+	# espera o layout recalcular o tamanho mínimo do conteúdo com o novo
+	# texto, depois redimensiona e recentra o painel manualmente a partir
+	# dos anchors 0.5/0.5 forçados em _ready()
+	await get_tree().process_frame
+	if not is_instance_valid(quit_confirm_panel):
+		return
+	var content_size: Vector2 = quit_confirm_vbox.get_combined_minimum_size() + QUIT_PANEL_PADDING
+	quit_confirm_panel.offset_left = -content_size.x / 2.0
+	quit_confirm_panel.offset_right = content_size.x / 2.0
+	quit_confirm_panel.offset_top = -content_size.y / 2.0
+	quit_confirm_panel.offset_bottom = content_size.y / 2.0
+
+
 func _exit_tree() -> void:
 	if SettingsManager.language_changed.is_connected(_on_language_changed):
 		SettingsManager.language_changed.disconnect(_on_language_changed)
+
 
 func _unhandled_input(event: InputEvent) -> void:
 	# Enquanto o OptionsMenu estiver aberto, o Esc não faz nada aqui — só o
@@ -194,6 +235,7 @@ func _on_quit_pressed() -> void:
 	btn_quit_cancel.grab_focus()
 	_animate_frames_out(true)   # esconde os frames enquanto confirma saída
 	_animate_menu_box_out(true, true)  # esconde o texto dos botões também
+	_center_quit_confirm_panel()
 
 
 func _on_quit_cancelled() -> void:
@@ -254,4 +296,3 @@ func _animate_menu_box_out(quick: bool = false, keep_visible: bool = false) -> v
 
 	if not keep_visible:
 		tween.finished.connect(func(): menu_box.visible = false)
-		

@@ -7,9 +7,17 @@ extends Control
 @onready var progress_bar: ProgressBar = $ProgressBar
 @onready var trail_bar: ProgressBar = $TrailFill
 @onready var hit_particles: CPUParticles2D = $"../CPUParticles2D"
+@onready var mask_icons: Array[MaskIcon] = [
+	$"../MaskIcons/MaskIcon",
+	$"../MaskIcons/MaskIcon2",
+	$"../MaskIcons/MaskIcon3",
+	$"../MaskIcons/MaskIcon4",
+	$"../MaskIcons/MaskIcon5"
+]
 
 var max_health: int = 100
 var current_health: int = 100
+var _exploded_count: int = 0
 
 
 func _ready() -> void:
@@ -43,6 +51,8 @@ func _on_health_changed(new_health: int, max_hp: int) -> void:
 	if took_damage:
 		flash_damage()
 
+	_update_mask_icons(took_damage)
+
 
 func update_fill_color(ratio: float) -> void:
 	if not gradient:
@@ -60,3 +70,13 @@ func flash_damage() -> void:
 	var tw := create_tween()
 	tw.tween_property(self, "scale", Vector2(1.05, 1.1), 0.06)
 	tw.tween_property(self, "scale", Vector2.ONE, 0.15).set_trans(Tween.TRANS_ELASTIC)
+
+
+func _update_mask_icons(took_damage: bool) -> void:
+	if not took_damage:
+		return
+	if _exploded_count >= mask_icons.size():
+		return
+
+	mask_icons[_exploded_count].explode()
+	_exploded_count += 1
